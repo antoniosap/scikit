@@ -1,7 +1,7 @@
 # Hierarchical Clustering Dendrogram
 
 import numpy as np
-
+import string
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 from sklearn.datasets import load_iris
@@ -30,7 +30,7 @@ def plot_dendrogram(model, **kwargs):
     dendrogram(linkage_matrix, **kwargs)
 
 
-def main():
+def main1():
     iris = load_iris()
     X = iris.data
 
@@ -45,5 +45,42 @@ def main():
     plt.show()
 
 
+def main2():
+    X = np.array([[ord('A'), 2.0], [ord('A'), 5.4], [ord('A'), 2.2],
+                  [ord('B'), 5.0], [ord('B'), 5.1], [ord('B'), 5.2]])
+    clustering = AgglomerativeClustering().fit(X)
+    print(clustering.labels_)
+    print(clustering.n_clusters_)
+
+
+def charCounters():
+    """ total character count histogram """
+    char_counters = {c: 0 for c in string.printable}
+    with open("target/m10rom.lst", "r") as f:
+        for line in f:
+            line = line.strip()
+            for c in line:
+                if c not in char_counters:
+                    char_counters[c] = 0
+                char_counters[c] += 1
+    print(char_counters)
+
+
+def columnCounters():
+    """ total character count for position on line histogram """
+    column_counters = np.array([{c: 0 for c in string.printable} for i in range(0, 80)])
+    with open("target/m10rom.lst", "r") as f:
+        for line in f:
+            line = line.strip()
+            i = 0
+            for c in line:
+                if c not in column_counters[i]:
+                    column_counters[i][c] = 0
+                column_counters[i][c] += 1
+                i += 1
+    print(column_counters)
+
+
 if __name__ == '__main__':
-    main()
+    # charCounters()
+    columnCounters()

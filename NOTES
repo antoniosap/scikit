@@ -9,4 +9,8 @@ https://fjkraan.home.xs4all.nl/comp/m10/
 
 TODO clustering riga per riga a zone nella riga --> ci sono zone nelle singole righe ?
 TODO bigrammi trigrammi quadrigrammi, ecc
-TODO considerare lo spazio come un altro carattere
+    https://www.codespeedy.com/compute-bigrams-frequency-in-a-string-in-python/
+    https://docs.python.org/3.10/library/collections.html#collections.Counter
+OK considerare lo spazio come un altro carattere
+TODO cythonize
+    https://cython.readthedocs.io/en/latest/src/tutorial/cython_tutorial.html
