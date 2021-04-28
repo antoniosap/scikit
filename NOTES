@@ -1,0 +1,12 @@
+27.4.2021
+---------
+
+sites:
+https://scikit-learn.org/stable/
+
+target:
+https://fjkraan.home.xs4all.nl/comp/m10/
+
+TODO clustering riga per riga a zone nella riga --> ci sono zone nelle singole righe ?
+TODO bigrammi trigrammi quadrigrammi, ecc
+TODO considerare lo spazio come un altro carattere
