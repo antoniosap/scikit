@@ -2,6 +2,7 @@
 
 import numpy as np
 import string
+from collections import Counter
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 from sklearn.datasets import load_iris
@@ -55,15 +56,12 @@ def main2():
 
 def charCounters():
     """ total character count histogram """
-    char_counters = {c: 0 for c in string.printable}
+    result = Counter()
     with open("target/m10rom.lst", "r") as f:
         for line in f:
             line = line.strip()
-            for c in line:
-                if c not in char_counters:
-                    char_counters[c] = 0
-                char_counters[c] += 1
-    print(char_counters)
+            result.update(line)
+    return dict(result)
 
 
 def columnCounters():
@@ -78,9 +76,27 @@ def columnCounters():
                     column_counters[i][c] = 0
                 column_counters[i][c] += 1
                 i += 1
-    print(column_counters)
+    return column_counters
+
+
+def nGramsCounters(ngram=2):
+    result = Counter()
+    with open("target/m10rom.lst", "r") as f:
+        for line in f:
+            line = line.strip()
+            result.update(line[x:x + ngram] for x in range(len(line) - ngram + 1))
+    return dict(result)
 
 
 if __name__ == '__main__':
-    # charCounters()
-    columnCounters()
+    # print(charCounters())
+    # print("-" * 50)
+    # print(columnCounters())
+    # print("-" * 50)
+    print(nGramsCounters(ngram=2))
+    print("-" * 50)
+    # print(nGramsCounters(ngram=3))
+    # print("-" * 50)
+    # print(nGramsCounters(ngram=4))
+    # print("-" * 50)
+    # print(nGramsCounters(ngram=5))
