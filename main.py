@@ -116,3 +116,4 @@ if __name__ == '__main__':
     sk = SciKit("target/m10rom.lst")
     # sk.initCounters()
     sk.loadCounters()
+    sk.main2()
