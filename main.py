@@ -3,11 +3,18 @@
 import numpy as np
 import string
 import json
+import re
+import random
+from multiprocessing import cpu_count
 from collections import Counter
 from matplotlib import pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 from sklearn.datasets import load_iris
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.decomposition import IncrementalPCA    # inital reduction
+from sklearn.manifold import TSNE                   # final reduction
+from gensim.models import Word2Vec
+from gensim import utils
 
 
 class SciKit:
@@ -16,6 +23,7 @@ class SciKit:
         self.charCount = None
         self.columnCount = None
         self.nGrams = [0] * 4
+        self.model = None
 
     def plot_dendrogram(self, model, **kwargs):
         # create linkage matrix and then plot the dendrogram
@@ -111,9 +119,71 @@ class SciKit:
             with open(f"pickles/nGramsCounters{i}.json", "r") as f:
                 self.nGrams[i - 2] = json.load(f)
 
+    def trainWord2Vec(self):
+        """ train word embeddings on lines """
+        skd = SciKitData(self.filePath)
+        self.model = Word2Vec(sentences=skd, workers=cpu_count())
+        self.model.save("pickles/word2vec.bin")
+
+    def loadWord2Vec(self):
+        self.model = Word2Vec.load("pickles/word2vec.bin")
+
+    def showWord2Vec(self):
+        for index, word in enumerate(self.model.wv.index_to_key):
+            print(f"word #{index}/{len(self.model.wv.index_to_key)} is {word}")
+
+    def plotWord2Vec(self, block=False):
+        x_vals, y_vals, labels = self.reduce_dimensions()
+        self.plot_with_matplotlib(x_vals, y_vals, labels, block)
+
+    def reduce_dimensions(self):
+        num_dimensions = 2  # final num dimensions (2D, 3D, etc)
+
+        # extract the words & their vectors, as numpy arrays
+        vectors = np.asarray(self.model.wv.vectors)
+        labels = np.asarray(self.model.wv.index_to_key)  # fixed-width numpy strings
+
+        # reduce using t-SNE
+        tsne = TSNE(n_components=num_dimensions, random_state=0)
+        vectors = tsne.fit_transform(vectors)
+
+        x_vals = [v[0] for v in vectors]
+        y_vals = [v[1] for v in vectors]
+        return x_vals, y_vals, labels
+
+    def plot_with_matplotlib(self, x_vals, y_vals, labels, block):
+        random.seed(0)
+        plt.figure(figsize=(50, 80), facecolor='black')
+        plt.scatter(x_vals, y_vals)
+        #
+        # Label randomly subsampled n data points
+        #
+        for i in range(len(labels)):
+            plt.annotate(labels[i], (x_vals[i], y_vals[i]))
+        if block:
+            plt.show()
+
+
+class SciKitData:
+    """An iterator that yields sentences (lists of str)."""
+    def __init__(self, filePath):
+        self.filePath = filePath
+
+    def __iter__(self):
+        with open(self.filePath, "r") as f:
+            for line in f:
+                line = line.strip()
+                # yield utils.simple_preprocess(line)    # humans text
+                yield line.split()                       # ASM 8085 program text
+
 
 if __name__ == '__main__':
     sk = SciKit("target/m10rom.lst")
     # sk.initCounters()
-    sk.loadCounters()
-    sk.main2()
+    # sk.loadCounters()
+    # sk.main2()
+    # sk.trainWord2Vec()
+    sk.loadWord2Vec()
+    # sk.showWord2Vec()
+    # sk.plotWord2Vec(block=True)
+    # print(sk.model.mv.most_similar('MOV'))
